@@ -2,16 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bro's Advanced Control Center</title>
     <style>
-        /* CSS Variables for Dynamic Theme Swapping */
         :root {
             --bg-main: #121214;
             --bg-side: #1c1c21;
             --bg-card: #25252f;
             --border-color: #3a3a45;
-            --accent: #00ffcc; /* Default Neon Cyan */
+            --accent: #00ffcc;
             --accent-glow: rgba(0, 255, 204, 0.3);
             --text: #ffffff;
         }
@@ -22,68 +20,84 @@
             background: var(--bg-main);
             color: var(--text);
             display: flex;
-            height: 100vh;
-            transition: background 0.3s;
+            width: 750px; /* Locked size optimized for a dropdown extension window */
+            height: 500px;
         }
 
-        /* Left Side: Input Form & Settings */
         .input-panel {
             flex: 1;
-            padding: 40px;
+            padding: 25px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             border-right: 2px solid var(--border-color);
         }
         
-        h2 { color: var(--accent); margin-bottom: 5px; text-shadow: 0 0 10px var(--accent-glow); }
-        .counter { color: #888; font-size: 0.9rem; margin-bottom: 25px; }
+        #cyberClock {
+            font-family: 'Courier New', monospace;
+            font-size: 2.8rem;
+            font-weight: bold;
+            color: var(--accent);
+            text-shadow: 0 0 15px var(--accent-glow);
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        h2 { color: var(--accent); margin: 0 0 5px 0; font-size: 1.4rem; }
+        .counter { color: #888; font-size: 0.85rem; margin-bottom: 15px; }
 
         input {
             background: var(--bg-side);
             border: 1px solid var(--border-color);
             color: white;
-            padding: 12px;
-            margin-bottom: 15px;
+            padding: 10px;
+            margin-bottom: 10px;
             border-radius: 6px;
-            font-size: 1rem;
+            font-size: 0.9rem;
             outline: none;
         }
         input:focus { border-color: var(--accent); }
 
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
         button {
+            flex: 1;
             background: var(--accent);
             color: #121214;
             border: none;
-            padding: 12px;
+            padding: 10px;
             font-weight: bold;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 1rem;
+            font-size: 0.9rem;
             transition: 0.2s;
         }
         button:hover { opacity: 0.9; }
+
+        .grab-btn {
+            background: #ffffff;
+            color: #121214;
+        }
         
-        /* Theme Selector Panel */
         .theme-panel {
-            margin-top: 30px;
             display: flex;
             gap: 10px;
             align-items: center;
         }
-        .theme-panel span { color: #888; font-size: 0.9rem; }
+        .theme-panel span { color: #888; font-size: 0.85rem; }
         .theme-dot {
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             border-radius: 50%;
             cursor: pointer;
-            border: 2px solid transparent;
         }
-        .theme-dot:hover { transform: scale(1.1); }
 
-        /* Right Side: Sidebar Area */
         .sidebar-links {
-            width: 320px;
+            width: 300px;
             background: var(--bg-side);
             padding: 20px;
             display: flex;
@@ -92,18 +106,18 @@
         
         .sidebar-header {
             border-bottom: 1px solid var(--border-color);
-            padding-bottom: 15px;
+            padding-bottom: 10px;
             margin-bottom: 15px;
         }
         .sidebar-header h3 { color: #888; margin: 0 0 10px 0; }
-        .search-box { width: 91%; padding: 8px 12px; margin-bottom: 0; font-size: 0.9rem; }
+        .search-box { width: 90%; padding: 8px; font-size: 0.85rem; }
 
         .link-container {
             flex: 1;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
 
         .link-card {
@@ -111,42 +125,38 @@
             justify-content: space-between;
             align-items: center;
             background: var(--bg-card);
-            padding: 12px 15px;
+            padding: 10px;
             border-radius: 6px;
             border-left: 4px solid var(--accent);
-            transition: transform 0.2s;
         }
-        .link-card:hover { transform: translateX(3px); }
         .link-card a {
             color: #ffffff;
             text-decoration: none;
             font-weight: 500;
-            word-break: break-all;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 200px;
         }
         .link-card a:hover { color: var(--accent); }
-        
-        .delete-btn {
-            background: none;
-            color: #ff5555;
-            border: none;
-            cursor: pointer;
-            font-size: 1rem;
-            padding: 0 5px;
-        }
+        .delete-btn { background: none; color: #ff5555; border: none; cursor: pointer; font-size: 0.9rem; }
     </style>
 </head>
 <body>
 
-    <!-- Left Panel -->
     <div class="input-panel">
-        <h2>Add New Website</h2>
+        <div id="cyberClock">00:00:00</div>
+        <h2>Control Panel</h2>
         <div class="counter" id="linkCounter">Total Saved: 0 links</div>
         
-        <input type="text" id="siteName" placeholder="e.g., GitHub">
-        <input type="text" id="siteUrl" placeholder="e.g., github.com">
-        <button onclick="addLink()">Launch & Save Link</button>
+        <input type="text" id="siteName" placeholder="Custom Name (Optional)">
+        <input type="text" id="siteUrl" placeholder="Custom URL (Optional)">
+        
+        <div class="btn-group">
+            <button onclick="addManualLink()">Save Custom</button>
+            <button class="grab-btn" id="grabTabBtn">⚡ Grab Current Tab</button>
+        </div>
 
-        <!-- Theme Switcher UI -->
         <div class="theme-panel">
             <span>Theme:</span>
             <div class="theme-dot" style="background: #00ffcc;" onclick="setTheme('cyan')"></div>
@@ -155,104 +165,14 @@
         </div>
     </div>
 
-    <!-- Right Sidebar -->
     <div class="sidebar-links">
         <div class="sidebar-header">
             <h3>Saved Links</h3>
-            <input type="text" id="searchBox" class="search-box" placeholder="🔍 Search links..." oninput="filterLinks()">
+            <input type="text" id="searchBox" class="search-box" placeholder="🔍 Search..." oninput="filterLinks()">
         </div>
-        <div class="link-container" id="linkContainer">
-            <!-- Dynamically populated links -->
-        </div>
+        <div class="link-container" id="linkContainer"></div>
     </div>
 
-    <script>
-        // Load settings and data on startup
-        window.onload = function() {
-            const savedTheme = localStorage.getItem('userTheme') || 'cyan';
-            setTheme(savedTheme);
-            displayLinks();
-        };
-
-        function addLink() {
-            const nameInput = document.getElementById('siteName');
-            const urlInput = document.getElementById('siteUrl');
-            let name = nameInput.value.trim();
-            let url = urlInput.value.trim();
-
-            if (!name || !url) {
-                alert("Fill out the boxes first, bro!");
-                return;
-            }
-
-            if (!/^https?:\/\//i.test(url)) {
-                url = 'https://' + url;
-            }
-
-            const links = JSON.parse(localStorage.getItem('myLinks')) || [];
-            links.push({ name: name, url: url });
-            localStorage.setItem('myLinks', JSON.stringify(links));
-
-            nameInput.value = '';
-            urlInput.value = '';
-            document.getElementById('searchBox').value = ''; // Reset search focus
-            displayLinks();
-        }
-
-        function displayLinks(filterText = '') {
-            const container = document.getElementById('linkContainer');
-            container.innerHTML = '';
-            
-            const links = JSON.parse(localStorage.getItem('myLinks')) || [];
-            
-            // Update counter
-            document.getElementById('linkCounter').textContent = `Total Saved: ${links.length} links`;
-
-            links.forEach((item, index) => {
-                // If searching, skip items that don't match the search query
-                if (filterText && !item.name.toLowerCase().includes(filterText.toLowerCase())) {
-                    return;
-                }
-
-                const card = document.createElement('div');
-                card.className = 'link-card';
-                card.innerHTML = `
-                    <a href="${item.url}" target="_blank">${item.name}</a>
-                    <button class="delete-btn" onclick="deleteLink(${index})">✕</button>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function deleteLink(index) {
-            const links = JSON.parse(localStorage.getItem('myLinks')) || [];
-            links.splice(index, 1);
-            localStorage.setItem('myLinks', JSON.stringify(links));
-            displayLinks(document.getElementById('searchBox').value);
-        }
-
-        // Live Search Filter Logic
-        function filterLinks() {
-            const searchVal = document.getElementById('searchBox').value;
-            displayLinks(searchVal);
-        }
-
-        // Dynamic Theme Switcher System
-        function setTheme(theme) {
-            const root = document.documentElement;
-            localStorage.setItem('userTheme', theme);
-            
-            if (theme === 'cyan') {
-                root.style.setProperty('--accent', '#00ffcc');
-                root.style.setProperty('--accent-glow', 'rgba(0, 255, 204, 0.3)');
-            } else if (theme === 'red') {
-                root.style.setProperty('--accent', '#ff0055');
-                root.style.setProperty('--accent-glow', 'rgba(255, 0, 85, 0.3)');
-            } else if (theme === 'green') {
-                root.style.setProperty('--accent', '#39ff14');
-                root.style.setProperty('--accent-glow', 'rgba(57, 255, 20, 0.3)');
-            }
-        }
-    </script>
+    <script src="popup.js"></script>
 </body>
 </html>
